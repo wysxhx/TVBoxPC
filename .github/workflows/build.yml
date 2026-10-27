@@ -1,0 +1,28 @@
+name: Build TVBoxPC WPF
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 拉取源码
+        uses: actions/checkout@v4
+
+      - name: 安装 .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 编译发布 Release
+        run: |
+          dotnet restore
+          dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+
+      - name: 上传打包好的程序
+        uses: actions/upload-artifact@v4
+        with:
+          name: TVBoxPC-WPF-x64
+          path: publish/*.exe
